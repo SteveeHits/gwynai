@@ -21,12 +21,15 @@ export async function getVeniceResponse(
   messages: Message[],
 ): Promise<ReadableStream<string>> {
   
-  const apiKey = "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";
+  // IMPORTANT: You must set your OpenRouter API key in an environment variable.
+  // Create a file named .env at the root of your project and add the following line:
+  // OPENROUTER_API_KEY="your_secret_key_here"
+  const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
     const readableStream = new ReadableStream({
       start(controller) {
-        const errorMessage = "Error: API key is not set.";
+        const errorMessage = "Error: OPENROUTER_API_KEY is not set. Please add your API key to the .env file.";
         controller.enqueue(new TextEncoder().encode(errorMessage));
         controller.close();
       }
