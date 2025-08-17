@@ -24,7 +24,7 @@ export async function getVeniceResponse(
 ): Promise<ReadableStream<string>> {
   
   // The API key is hardcoded as requested.
-  const apiKey = "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";
+  const apiKey = "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";
 
   if (!apiKey) {
     const readableStream = new ReadableStream({
