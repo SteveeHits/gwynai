@@ -7,6 +7,8 @@ interface Settings {
   fullscreen: boolean;
   theme: string;
   backgroundAnimationsEnabled: boolean;
+  voiceModeEnabled: boolean;
+  voiceGender: 'male' | 'female';
 }
 
 interface SettingsContextType {
@@ -22,6 +24,8 @@ const defaultSettings: Settings = {
   fullscreen: false,
   theme: 'default',
   backgroundAnimationsEnabled: true,
+  voiceModeEnabled: false,
+  voiceGender: 'female',
 };
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
@@ -34,7 +38,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       const storedSettings = localStorage.getItem('app-settings');
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
-        setSettingsState(prev => ({ ...prev, ...parsedSettings }));
+        setSettingsState(prev => ({ ...defaultSettings, ...parsedSettings }));
       }
     } catch (error) {
       console.error('Failed to parse settings from localStorage', error);

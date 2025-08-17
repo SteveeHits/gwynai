@@ -82,6 +82,34 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                             </div>
                         </div>
 
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-medium flex items-center gap-2"><Mic className="h-5 w-5" /> Voice Settings</h3>
+                            <div className="flex items-center justify-between rounded-lg border p-3">
+                                <Label htmlFor="voice-mode" className="flex items-center gap-2">Enable Voice Mode</Label>
+                                <Switch
+                                    id="voice-mode"
+                                    checked={localSettings.voiceModeEnabled}
+                                    onCheckedChange={(checked) => setLocalSettings(s => ({...s, voiceModeEnabled: checked}))}
+                                />
+                            </div>
+                             <div className="flex items-center justify-between rounded-lg border p-3">
+                                <Label htmlFor="voice-gender" className="flex items-center gap-2">Voice</Label>
+                                <Select
+                                    value={localSettings.voiceGender}
+                                    onValueChange={(value: 'male' | 'female') => setLocalSettings(s => ({...s, voiceGender: value}))}
+                                    disabled={!localSettings.voiceModeEnabled}
+                                >
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Select a voice" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="female">Female</SelectItem>
+                                        <SelectItem value="male">Male</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
                     </div>
                 </ScrollArea>
 

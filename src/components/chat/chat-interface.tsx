@@ -52,6 +52,47 @@ export function ChatInterface({
   const { toast } = useToast();
 
   useEffect(() => {
+    // Cancel any ongoing speech when the component unmounts or conversation changes
+    return () => {
+      if (window.speechSynthesis?.speaking) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [conversation.id]);
+  
+  // Effect for handling text-to-speech
+  useEffect(() => {
+    if (!settings.voiceModeEnabled || !lastMessageIsNew) {
+      return;
+    }
+  
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
+  
+    if (lastMessage && lastMessage.role === 'assistant' && lastMessage.content && !isLoading) {
+      // Small delay to ensure the UI has updated
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(lastMessage.content);
+        
+        const voices = window.speechSynthesis.getVoices();
+        let selectedVoice = null;
+        if (settings.voiceGender === 'male') {
+          selectedVoice = voices.find(v => v.name.toLowerCase().includes('male') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
+        } else {
+          selectedVoice = voices.find(v => v.name.toLowerCase().includes('female') && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
+        }
+  
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
+  
+        window.speechSynthesis.cancel(); // Stop any previous speech
+        window.speechSynthesis.speak(utterance);
+      }, 100);
+    }
+  }, [conversation.messages, isLoading, settings.voiceModeEnabled, settings.voiceGender, lastMessageIsNew]);
+
+
+  useEffect(() => {
     if (scrollAreaViewportRef.current) {
         scrollAreaViewportRef.current.scrollTop = scrollAreaViewportRef.current.scrollHeight;
     }
@@ -77,6 +118,9 @@ export function ChatInterface({
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
       setIsLoading(false);
+    }
+    if (window.speechSynthesis?.speaking) {
+      window.speechSynthesis.cancel();
     }
   };
 
@@ -280,7 +324,8 @@ export function ChatInterface({
       let accumulatedResponse = '';
       
       const originalMessage = conversation.messages.find(m => m.id === assistantMessageId);
-      const originalContent = originalMessage?.content || '';
+      const originalContent = messageIdToUpdate ? originalMessage?.content || '' : '';
+
 
       while (true) {
         const { done, value } = await reader.read();
